@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>wss</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="http://localhost:3001/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div id="v-app">
+        <h1>{{title}}</h1>
+    <form >
+        <input v-model="text" type="text" />
+        <button type="submit" @click.prevent="sendMessage()">send</button>
+
+    </form>
+    <p>
+        <ul>
+            <li v-for="msg of messages">{{msg}}</li>
+        </ul>
+    </p>
+    </div>
+</body>
+<script>
+    var app = new Vue({
+        el:"#v-app",
+        data:{
+            title: "Websockets Tester",
+            text: "",
+            messages: ['some message', 'another message'],
+            socket: {
+                chats: null, alerts: null
+            }
+        },
+        methods:{
+            sendMessage(){
+                // this.messages.push(this.text);
+                console.log('send msg', this.text);
+                this.socket.emit('msgToServer', this.text)
+                this.text = "";
+            },
+            receiveMessage(msg){
+                console.log('recv msg', msg);
+                this.messages.push(msg);
+            }
+        },
+        created(){
+            this. socket = io("http://localhost:3001" );
+            this.socket.on('msgToClient', (msg)=>{
+                // console.log('recv msg', msg);
+                this.receiveMessage(msg)
+            })
+        }
+    })
+</script>
+</html>
